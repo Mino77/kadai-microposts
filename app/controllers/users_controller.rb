@@ -1,13 +1,19 @@
 class UsersController < ApplicationController
-  before_action :require_user_logged_in, only: [:index, :show, :followings, :followers]
+  # likes追加
+  before_action :require_user_logged_in, only: [:index, :show, :followings, :followers, :likes]
   def index
     @users = User.all.page(params[:page])
   end
 
   def show
     @user = User.find(params[:id])
+    # current_user以外はindexへ移動させる
+    #unless @user == current_user
+    #  redirect_to root_url
+    #end
     @microposts = @user.microposts.order('created_at DESC').page(params[:page])
     counts(@user)
+    
   end
 
   def new
@@ -37,6 +43,16 @@ class UsersController < ApplicationController
     @followers = @user.followers.page(params[:page])
     counts(@user)
   end
+  
+  
+  def likes
+    @user = User.find(params[:id])
+    @likes = @user.favorite_microposts.page(params[:page])
+    @microposts = @user.favorite_microposts.order('created_at DESC').page(params[:page])
+    counts(@user)
+  end
+  
+  
   
   private
   
